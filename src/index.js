@@ -45,7 +45,7 @@ const tweets = [
 
 
 server.get('/tweets', (req, res) => {
-    const lastTweets = tweets.slice(-10);
+    const lastTweets = tweets.reverse().slice(0, 10);
 
     lastTweets.forEach(tweet => {
         const user = users.find(user => user.username === tweet.username);
@@ -53,6 +53,19 @@ server.get('/tweets', (req, res) => {
     });
 
     res.send(lastTweets);
+});
+
+server.get('/tweets/:username', (req, res) => {
+    const userName = req.params.username;
+
+    const userTweets = tweets.filter(({ username }) => username === userName);
+
+    userTweets.forEach(tweet => {
+        const user = users.find(user => user.username === tweet.username);
+        tweet.avatar = user.avatar
+    });
+
+    res.send(userTweets);
 });
 
 server.listen(5000, () => console.log('Servidor rodando na porta 5000'));
