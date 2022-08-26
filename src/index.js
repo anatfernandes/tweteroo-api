@@ -37,12 +37,12 @@ server.post('/sign-up', (req, res) => {
 });
 
 server.post('/tweets', (req, res) => {
-    if (!req.body.username || !req.body.tweet) {
+    if (!req.headers.username || !req.body.tweet) {
         res.status(400).send("Todos os campos são obrigatórios!");
     } else {
 
-        tweets.push(req.body);
-        
+        tweets.push({...req.body, username: req.headers.username});
+
         res.status(201).send("OK");
     }
 });
@@ -51,7 +51,7 @@ server.get('/tweets', (req, res) => {
     const page = Number(req.query.page);
 
     if (page && page >= 1) {
-        
+
         updatePosts();
 
         const lastTweets = posts.reverse().slice(0, (10 * page));
