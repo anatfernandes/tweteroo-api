@@ -4,66 +4,53 @@ import cors from 'cors';
 const server = express();
 
 server.use(cors());
+server.use(express.json());
 
-const users = [
-    {
-        username: "bobesponja",
-        avatar: "https://super.abril.com.br/wp-content/uploads/2020/09/04-09_gato_SITE.jpg?quality=70&strip=info"
-    },
-    {
-        username: "lulinha",
-        avatar: "https://imgLulinha"
-    },
-    {
-        username: "patrick",
-        avatar: "https://imgPatrick"
-    },
-    {
-        username: "bobesponja",
-        avatar: "https://super.abril.com.br/wp-content/uploads/2020/09/04-09_gato_SITE.jpg?quality=70&strip=info"
-    }
-]
+const users = [];
 
-const tweets = [
-    {
-        username: "bobesponja",
-        tweet: "eu amo o hub"
-    },
-    {
-        username: "lulinha",
-        tweet: "odeio o @bobesponja"
-    },
-    {
-        username: "bobesponja",
-        tweet: "hehe"
-    },
-    {
-        username: "patrick",
-        tweet: "quero comer"
-    }
-]
+const tweets = [{
+    username: "bobesponja",
+    tweet: "eu amo o hub"
+},{
+    username: "lulu",
+    tweet: "eu amo o hub"
+}]
 
+const posts = [];
+
+
+function updatePosts () {
+    const allTweets = [...tweets];
+
+    allTweets.forEach(tweet => {
+        const user = users.find(user => user.username === tweet.username);
+        tweet.avatar = user.avatar;
+    });
+
+    posts.push(...allTweets);
+}
+
+
+server.post('/sign-up', (req, res) => {
+    users.push(req.body);
+    
+    res.send("OK");
+});
 
 server.get('/tweets', (req, res) => {
-    const lastTweets = tweets.reverse().slice(0, 10);
+    updatePosts();
 
-    lastTweets.forEach(tweet => {
-        const user = users.find(user => user.username === tweet.username);
-        tweet.avatar = user.avatar
-    });
+    const lastTweets = posts.reverse().slice(0, 10);
 
     res.send(lastTweets);
 });
 
 server.get('/tweets/:username', (req, res) => {
+    updatePosts();
+
     const userName = req.params.username;
 
-    const userTweets = tweets.filter(({ username }) => username === userName);
-
-    userTweets.forEach(tweet => {
-        const user = users.find(user => user.username === tweet.username);
-        tweet.avatar = user.avatar
-    });
+    const userTweets = posts.filter(({ username }) => username === userName);
 
     res.send(userTweets);
 });
