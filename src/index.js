@@ -26,15 +26,25 @@ function updatePosts () {
 
 
 server.post('/sign-up', (req, res) => {
-    users.push(req.body);
+    if (!req.body.username || !req.body.avatar) {
+        res.status(400).send("Todos os campos são obrigatórios!");
+    } else {
 
-    res.send("OK");
+        users.push(req.body);
+
+        res.send("OK");
+    }
 });
 
 server.post('/tweets', (req, res) => {
-    tweets.push(req.body);
-    
-    res.send("OK");
+    if (!req.body.username || !req.body.tweet) {
+        res.status(400).send("Todos os campos são obrigatórios!");
+    } else {
+
+        tweets.push(req.body);
+        
+        res.send("OK");
+    }
 });
 
 server.get('/tweets', (req, res) => {
