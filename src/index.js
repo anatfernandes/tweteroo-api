@@ -8,15 +8,9 @@ server.use(express.json());
 
 const users = [];
 
-const tweets = [{
-    username: "bobesponja",
-    tweet: "eu amo o hub"
-},{
-    username: "lulu",
-    tweet: "eu amo o hub"
-}]
+const tweets = []
 
-const posts = [];
+let posts = [];
 
 
 function updatePosts () {
@@ -27,12 +21,18 @@ function updatePosts () {
         tweet.avatar = user.avatar;
     });
 
-    posts.push(...allTweets);
+    posts = allTweets;
 }
 
 
 server.post('/sign-up', (req, res) => {
     users.push(req.body);
+
+    res.send("OK");
+});
+
+server.post('/tweets', (req, res) => {
+    tweets.push(req.body);
     
     res.send("OK");
 });
@@ -50,7 +50,7 @@ server.get('/tweets/:username', (req, res) => {
 
     const userName = req.params.username;
 
-    const userTweets = posts.filter(({ username }) => username === userName);
+    const userTweets = posts.filter(({ username }) => username === userName).reverse();
 
     res.send(userTweets);
 });
