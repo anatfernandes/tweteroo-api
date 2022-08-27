@@ -8,68 +8,96 @@ server.use(express.json());
 
 const users = [];
 
-const tweets = []
+const tweets = [];
 
 let posts = [];
 
 
 function updatePosts () {
-    const allTweets = [...tweets];
+    posts = [...tweets];
 
-    allTweets.forEach(tweet => {
+    posts.forEach(tweet => {
         const user = users.find(user => user.username === tweet.username);
         tweet.avatar = user.avatar;
     });
-
-    posts = allTweets;
 }
 
 
 server.post('/sign-up', (req, res) => {
-    if (!req.body.username || !req.body.avatar) {
-        res.status(400).send("Todos os campos são obrigatórios!");
-    } else {
+    const { username, avatar } = req.body;
 
-        users.push(req.body);
-
-        res.status(201).send("OK");
+    if (!username || !avatar) {
+        res.status(400).send({ message:"Todos os campos são obrigatórios!" });
+        return;
     }
+
+    const hasUsername = users.find(({ username: user }) => user === username);
+
+    if (hasUsername) {
+        res.status(409).send({ message:"Nome já existente" });
+        return;
+    }
+
+    users.push({ username, avatar, views:0 });
+
+    res.status(201).send({ message:"OK" });
 });
 
 server.post('/tweets', (req, res) => {
-    if (!req.headers.username || !req.body.tweet) {
-        res.status(400).send("Todos os campos são obrigatórios!");
-    } else {
+    const { user } = req.headers;
+    const { tweet } = req.body;
 
-        tweets.push({...req.body, username: req.headers.username});
-
-        res.status(201).send("OK");
+    if (!user || !tweet) {
+        res.status(400).send({ message:"Todos os campos são obrigatórios!" });
+        return;
     }
+
+    tweets.push({
+        date: new Date().toLocaleDateString('pt-br'),
+        time: new Date().toLocaleTimeString('pt-br'),
+        username: user,
+        tweet
+    });
+
+    res.status(201).send({ message:"OK" });
 });
 
 server.get('/tweets', (req, res) => {
     const page = Number(req.query.page);
+    const qtdTweets = 10;
 
     if (page && page >= 1) {
 
         updatePosts();
 
-        const lastTweets = posts.reverse().slice(0, (10 * page));
+        const lastTweets = posts
+            .reverse()
+            .slice((qtdTweets * (page - 1)), (qtdTweets * page))
+        ;
     
-        res.send(lastTweets);
-    } else {
-        res.status(400).send("Informe uma página válida!");
+        res.status(200).send(lastTweets);
+        return;
     }
+
+    res.status(400).send({ message:"Informe uma página válida!" });
 });
 
 server.get('/tweets/:username', (req, res) => {
+
     updatePosts();
 
-    const userName = req.params.username;
+    const user = req.params.username;
 
-    const userTweets = posts.filter(({ username }) => username === userName).reverse();
+    const userViews = users.find(({ username }) => username === user);
+    userViews.views += 1;
 
-    res.send(userTweets);
+    const userTweets = posts
+        .filter(({ username }) => username === user)
+        .map(post => ({ ...post, userViews: userViews.views }))
+        .reverse()
+    ;
+
+    res.status(200).send(userTweets);
 });
 
 server.listen(5000, () => console.log('Servidor rodando na porta 5000'));
