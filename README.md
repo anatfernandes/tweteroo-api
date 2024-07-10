@@ -1,5 +1,7 @@
 # :bird: Tweteroo Api
 
+![Badge Finalizado](https://img.shields.io/static/v1?label=STATUS&message=FINALIZADO&color=success&style=for-the-badge)
+
 # Índice
 
 - [Sobre](#Sobre)
@@ -98,10 +100,10 @@ URL base: `http://localhost:5000`
 
 1. Clone esse repositório:
 >```ruby
-> git clone https://github.com/AnaLTFernandes/tweteroo-api.git
+> git clone https://github.com/anatfernandes/tweteroo-api.git
 >```
 
-2. Instale as dependências:
+2. Na raíz do projeto, instale as dependências:
 >```ruby
 > npm install
 >```
@@ -111,4 +113,4 @@ URL base: `http://localhost:5000`
 > npm run dev
 >```
 
-8. Divirta-se nas rotas :)
+4. Divirta-se nas rotas :)
